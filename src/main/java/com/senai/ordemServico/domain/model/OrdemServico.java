@@ -22,6 +22,7 @@ import javax.validation.groups.Default;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.senai.ordemServico.domain.validationGroup;
+import com.senai.ordemServico.domain.exception.NegocioException;
 
 @Entity
 public class OrdemServico {
@@ -158,6 +159,17 @@ public class OrdemServico {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	public void finalizar() {
+		// Se o status não estiver aberto
+		if (!StatusOrdemServico.ABERTA.equals(getStatus())) {
+			throw new NegocioException("Ordem de serviço não pode ser finalizada");
+		}
+		// esses set já temos na propria classe na linha 103 e 119
+		setStatus(StatusOrdemServico.FINALIZADA);
+		setDataFinalizacao(LocalDateTime.now());
+
 	}
 
 }

@@ -16,38 +16,47 @@ import com.senai.ordemServico.domain.repository.OrdemServicoRepository;
 
 @Service
 public class GestaoOrdemServicoService {
-	
+
 	@Autowired
 	private OrdemServicoRepository ordemServicoRepository;
-	
+
 	@Autowired
 	private ClienteRepository clienteRepository;
-	
+
 	@Autowired
 	private ComentarioRepository comentarioRepository;
 
-	//Quando abre uma ordem de serviço.
-	public OrdemServico criar (OrdemServico ordemServico) {
+	// Quando abre uma ordem de serviço.
+	public OrdemServico criar(OrdemServico ordemServico) {
 		Cliente cliente = clienteRepository.findById(ordemServico.getCliente().getId())
 				.orElseThrow(() -> new NegocioException("Cliente não encontrado!"));
-		
+
 		ordemServico.setCliente(cliente);
 		ordemServico.setStatus(StatusOrdemServico.ABERTA);
 		ordemServico.setDataAbertura(LocalDateTime.now());
 		return ordemServicoRepository.save(ordemServico);
-		
+
 	}
-	//Criando o comentário dentro da ordem serviço
+
+	// Criando o comentário dentro da ordem serviço
 	public Comentario adicionarComentario(Long ordemServicoId, String descricao) {
 		OrdemServico ordemServico = ordemServicoRepository.findById(ordemServicoId)
-			.orElseThrow(() -> new NegocioException("Ordem e serviço não encontrado!"));
-		
+				.orElseThrow(() -> new NegocioException("Ordem e serviço não encontrado!"));
+
 		Comentario comentario = new Comentario();
 		comentario.setDataEnvio(LocalDateTime.now());
 		comentario.setDescricao(descricao);
 		comentario.setOrdemServico(ordemServico);
-		
+
 		return comentarioRepository.save(comentario);
 	}
-	
+
+	public void finalizar(Long ordemServicoId) {
+		OrdemServico ordemServico = ordemServicoRepository.findById(ordemServicoId)
+				.orElseThrow(() -> new NegocioException("Ordem e serviço não encontrado!"));
+		ordemServico.finalizar(); // Vou Criar esse metodo dentro de ordemServico Modal.
+
+		ordemServicoRepository.save(ordemServico);
+	}
+
 }
